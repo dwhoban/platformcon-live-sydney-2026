@@ -1,0 +1,60 @@
+---
+import { buttonVariants } from "@cloudflare/kumo/components/button";
+import { cn } from "@cloudflare/kumo/utils";
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
+
+interface Props {
+  class?: string;
+  "data-language"?: string;
+  [attribute: string]: unknown;
+}
+
+const { class: className, "data-language": language, ...attrs } = Astro.props;
+const label = language && language !== "plaintext" && language !== "text" ? language : undefined;
+---
+
+<div class="code-block group/code not-prose relative my-5">
+  <pre
+    class={cn(className, "m-0 rounded-lg px-4 py-3.5 font-mono text-sm leading-relaxed ring ring-kumo-line")}
+    data-language={language}
+    {...attrs}><slot /></pre>
+  {
+    label && (
+      <span
+        class="pointer-events-none absolute top-2.5 right-3 text-xs text-kumo-subtle select-none group-focus-within/code:opacity-0 group-hover/code:opacity-0"
+        data-pagefind-ignore
+      >
+        {label}
+      </span>
+    )
+  }
+  <button
+    type="button"
+    class={cn(
+      buttonVariants({ variant: "ghost", size: "sm", shape: "square" }),
+      "group/copy absolute top-2 right-2 bg-kumo-base opacity-0 ring ring-kumo-line group-hover/code:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100",
+    )}
+    aria-label="Copy code"
+    data-copy-code
+    data-pagefind-ignore
+  >
+    <CopyIcon size={14} className="group-data-copied/copy:hidden" />
+    <CheckIcon size={14} className="hidden group-data-copied/copy:block" />
+  </button>
+</div>
+
+<script>
+  document.addEventListener("click", async (event) => {
+    const button = (event.target as Element | null)?.closest<HTMLButtonElement>("[data-copy-code]");
+    const code = button?.closest(".code-block")?.querySelector("pre")?.textContent;
+    if (!button || code == null) return;
+
+    await navigator.clipboard.writeText(code);
+    button.dataset.copied = "";
+    button.setAttribute("aria-label", "Copied");
+    setTimeout(() => {
+      delete button.dataset.copied;
+      button.setAttribute("aria-label", "Copy code");
+    }, 2000);
+  });
+</script>

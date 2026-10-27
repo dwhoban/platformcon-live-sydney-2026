@@ -1,0 +1,99 @@
+---
+title: Setup
+description: Tools, accounts, two tokens and the lab folder, ready before the session starts.
+group: get-started
+lesson: 0
+---
+
+## Goal
+
+Get your tools, accounts, tokens and the lab folder ready before the session. Installing the template's dependencies takes a few minutes, so do it beforehand.
+
+## What you need
+
+- Node.js `22` or later
+- pnpm `10` or later (`npm install -g pnpm@latest`)
+- Git and the GitHub CLI (`gh`)
+- Terraform `1.9` or later
+- A GitHub account
+- The Cloudflare account you were given for the workshop
+- A code editor
+
+## Starting point
+
+### Download the workshop ZIP
+
+[Download the workshop ZIP](/downloads/lab.zip) and unzip it.
+
+Folder structure:
+
+```txt
+lab/
+  template/    the agent template you edit in lessons 01–04
+  terraform/   the Terraform module you build in lessons 05–07
+```
+
+### Install the template's dependencies
+
+```bash
+cd lab/template
+pnpm install
+```
+
+### Log in to Cloudflare
+
+```bash
+npx wrangler login
+npx wrangler whoami
+```
+
+`whoami` lists your workshop account and its **Account ID**. Note the Account ID: you need it in lesson 05.
+
+<Callout type="tip" title="More than one account?">
+If `whoami` lists more than one account, set the workshop account for every command in this terminal:
+
+```bash
+export CLOUDFLARE_ACCOUNT_ID=<your-account-id>
+```
+</Callout>
+
+In the [Cloudflare dashboard](https://dash.cloudflare.com/), open **Workers & Pages** once. If it asks you to choose a workers.dev subdomain, pick one: your agent is served from it in lesson 08.
+
+### Log in to GitHub
+
+```bash
+gh auth login --scopes workflow
+gh auth status
+```
+
+The `workflow` scope lets you push files in `.github/workflows`, which you do in lesson 04. `gh` doesn't ask for it by default. If you are already logged in, add it with `gh auth refresh --scopes workflow`.
+
+### Create a Cloudflare API token
+
+Terraform uses this token to create your agent's AI Gateway and Worker, and the agent's deploy workflow uses it to deploy.
+
+1. In the Cloudflare dashboard, go to **My Profile** > **API Tokens** > **Create Token**.
+2. Next to **Edit Cloudflare Workers**, select **Use template**.
+3. Select **Add more** and add the permission **Account** > **AI Gateway** > **Edit**.
+4. Under **Account Resources**, select your workshop account. Under **Zone Resources**, select **All zones from an account** and your workshop account.
+5. Select **Continue to summary** > **Create Token**, and copy the token.
+
+### Create a GitHub token
+
+Terraform uses this token to create your agent's repository and set its secrets.
+
+1. On GitHub, go to **Settings** > **Developer settings** > **Personal access tokens** > **Tokens (classic)** > **Generate new token (classic)**.
+2. Select the `repo` and `workflow` scopes. Add `delete_repo` if you want `terraform destroy` to delete the repository after the workshop.
+3. Select **Generate token**, and copy the token.
+
+Keep both tokens somewhere safe, such as your password manager. You paste them into Terraform in lesson 05.
+
+## Success check
+
+You are ready to start when:
+
+- `node --version`, `pnpm --version`, `gh --version` and `terraform version` meet the versions above.
+- `pnpm install` finished in `lab/template`.
+- `npx wrangler whoami` shows your workshop account.
+- `gh auth status` lists the `workflow` scope.
+- You have your Cloudflare Account ID, a Cloudflare API token and a GitHub token saved.

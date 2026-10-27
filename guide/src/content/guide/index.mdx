@@ -1,0 +1,47 @@
+---
+title: 5 defaults every agent needs
+description: Build an agent golden path on Cloudflare, a template and a Terraform module that give every new agent five controls from its first deploy.
+sidebarLabel: Overview
+group: get-started
+---
+
+Most platform teams ship AI agents with the same defaults as a CRUD service: shared credentials, no spend ceiling, no human in the loop, and no way to trace what the agent did. That works until an agent with write access makes ten thousand decisions overnight.
+
+In this workshop you build a golden path for agents, then stamp out an agent with it and watch each control fire.
+
+## What you'll build
+
+- **An agent template.** A chat agent on Cloudflare Workers: the [Pi harness](https://developers.cloudflare.com/agents/) from the Agents SDK, running on a Durable Object, with a durable workspace it can read, write and run JavaScript in. You add the controls to it in lessons 01–04.
+- **A Terraform module that stamps agents.** Given one agent name, it creates the agent's AI Gateway, its Worker, and its GitHub repository from the template, with deploy secrets. You build it in lessons 05–07.
+- **A deployed agent.** One workflow run later, your agent is live on workers.dev with all five controls on.
+
+Final app UI:
+
+![The agent asking for approval before it writes a file, with the Tools panel showing which tools need approval](/images/approval-gate.png)
+
+## The five defaults
+
+| Default | What it means | How Cloudflare provides it | Lessons |
+| --- | --- | --- | --- |
+| Its own identity | Every agent, and every user of it, is distinct and named | Its own Worker and AI Gateway, a Durable Object per user, and `agent_id` and `user_id` on every model call | 01, 05, 06 |
+| Scoped access to tools | The agent only gets the tools you allow, and code it runs can't reach the network | A tool allowlist, and `exec` running in a Dynamic Worker with no internet access | 02 |
+| Approval gates before write actions | Write actions wait for a person | The Durable Object holds the call open; Approve and Reject travel over a WebSocket | 02 |
+| Hard usage limits | A ceiling the agent can't spend past | AI Gateway rate limit and spend limits per agent and per user, plus a CPU limit per request | 01, 05 |
+| End-to-end tracing | You can see what the agent did, call by call | Workers Logs and Traces, and AI Gateway logs you can filter by `agent_id` and `user_id` | 01 |
+
+## What you'll leave with
+
+- A working template and Terraform module you can adapt for your own platform.
+- A clear model of what an agent golden path must provide, independent of vendor.
+- The three adoption metrics worth tracking from day one.
+
+## Lesson plan
+
+Every lesson follows the same loop:
+
+1. Identify the goal
+2. Make the change
+3. Run and verify
+4. Apply or deploy
+
+<LessonPlan />

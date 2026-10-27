@@ -1,0 +1,79 @@
+---
+title: Worker
+description: The agent's Worker, created by the platform, on workers.dev and tagged golden-path.
+group: terraform
+lesson: 6
+---
+
+## Goal
+
+Create the agent's Worker as a platform resource: named after the agent, on workers.dev, and tagged so you can count the agents built from the golden path. Terraform owns the Worker, and the deploy workflow owns its code.
+
+## Starting point
+
+Continue in the Terraform folder from lesson 05:
+
+```bash
+cd lab/terraform
+```
+
+## Steps
+
+1. Create the Worker.
+
+### 1. Create the Worker
+
+Create this file:
+
+```txt
+worker.tf
+```
+
+Add:
+
+```hcl
+# Identity: the agent's Worker, created by the platform before any code
+# exists. The deploy workflow uploads the code, bindings and Durable Object
+# migration to it.
+resource "cloudflare_worker" "agent" {
+  account_id = var.cloudflare_account_id
+  name       = var.agent_name
+
+  subdomain = {
+    enabled = true
+  }
+
+  # Lets the platform count the agents built from the golden path.
+  tags = ["golden-path"]
+}
+
+output "worker_url" {
+  value = cloudflare_worker.agent.subdomain.url
+}
+```
+
+`cloudflare_worker` is the Worker itself, with no code. On the first deploy, Wrangler uploads the code, the bindings and the Durable Object migration. Terraform and Wrangler each own one part, so they never fight over versions.
+
+<Callout type="tip" title="Short on time?">
+Skip this lesson. Wrangler creates the Worker on the first deploy, and the workflow's summary prints its URL. You lose the `golden-path` tag.
+</Callout>
+
+## Run and verify
+
+```bash
+terraform apply
+terraform output worker_url
+```
+
+In the Cloudflare dashboard, go to **Workers & Pages**. Your agent's Worker is there, with no deployments yet.
+
+## Success check
+
+You are ready for the next lesson when:
+
+- `terraform apply` finished with `1 added`.
+- `terraform output worker_url` prints your agent's workers.dev URL.
+
+## Next lesson
+
+In the next lesson, you will [stamp the agent's repository](/07-repo-secrets) from the template.

@@ -1,0 +1,50 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "agent-template",
+	"main": "src/server.ts",
+	"compatibility_date": "2026-06-11",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	// Lesson 01: identity goes here.
+	"ai": {
+		"binding": "AI",
+		"remote": true
+	},
+	// `exec` runs JavaScript in Dynamic Workers minted through this.
+	"worker_loaders": [
+		{
+			"binding": "LOADER"
+		}
+	],
+	"assets": {
+		"not_found_handling": "single-page-application",
+		"run_worker_first": [
+			"/api/*",
+			"/agents/*"
+		]
+	},
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "Agent",
+				"class_name": "Agent"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": [
+				"Agent"
+			]
+		}
+	],
+	// Lesson 01: usage limits go here.
+	// Lesson 01: tracing goes here.
+	"upload_source_maps": true
+}

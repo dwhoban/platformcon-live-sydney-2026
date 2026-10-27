@@ -1,0 +1,69 @@
+---
+title: Trigger deploy
+description: Run the deploy workflow, and use your agent on workers.dev.
+group: ship
+lesson: 8
+---
+
+## Goal
+
+Deploy the agent. A repository generated from a template doesn't fire a push event, so trigger the first run yourself, then use your agent on workers.dev.
+
+## Starting point
+
+Run these commands from the Terraform folder, so they can read its outputs:
+
+```bash
+cd lab/terraform
+```
+
+## Steps
+
+1. Run the deploy workflow.
+2. Watch it.
+3. Open your agent.
+
+### 1. Run the deploy workflow
+
+```bash
+gh workflow run deploy.yml --repo "$(terraform output -raw repo)"
+```
+
+If `gh` can't find the workflow, wait a few seconds and try again: GitHub is still setting up the new repository.
+
+### 2. Watch it
+
+```bash
+gh run watch --repo "$(terraform output -raw repo)"
+```
+
+Select the **Deploy agent** run. It installs, builds, and runs `wrangler deploy --name` with your agent's name and gateway. It takes about two minutes.
+
+### 3. Open your agent
+
+```bash
+terraform output worker_url
+```
+
+Open the URL. If you skipped lesson 06, the URL is in the run's summary on GitHub.
+
+## Run and verify
+
+The header shows your agent's name, and `gateway` followed by your agent's name: the workflow replaced both variables from the template.
+
+Select **Write a file**, send it, and approve the write. Then check where the evidence lives:
+
+- **AI Gateway**: go to **AI** > **AI Gateway**, open your agent's gateway, then **Logs**. Each model call shows `agent_id` (your agent's name) and `user_id`.
+- **Workers**: go to **Workers & Pages**, open your agent's Worker, then **Observability**. Traces show each request and the Durable Object work behind it. New traces can take a minute to appear.
+
+## Success check
+
+You are ready for the next lesson when:
+
+- The **Deploy agent** run finished green.
+- Your agent on workers.dev shows its own name and gateway.
+- Its gateway logs your calls with `agent_id` and `user_id`.
+
+## Next lesson
+
+In the last lesson, you will [watch each control fire](/09-wrap-up), and take home the adoption metrics.

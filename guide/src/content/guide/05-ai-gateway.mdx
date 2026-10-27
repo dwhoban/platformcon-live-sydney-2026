@@ -1,0 +1,168 @@
+---
+title: AI Gateway
+description: A gateway for the agent, with a request rate limit and daily spend limits per agent and per user.
+group: terraform
+lesson: 5
+---
+
+## Goal
+
+Give the agent its own AI Gateway, with hard usage limits enforced before any model is called:
+
+- a request rate limit across the whole agent
+- a daily spend limit for the agent
+- a daily spend limit for each user
+
+From here on, everything an agent gets is created by Terraform from one agent name.
+
+## Starting point
+
+Switch to the Terraform folder:
+
+```bash
+cd lab/terraform
+```
+
+The module already declares its providers and inputs:
+
+```txt
+terraform/
+  versions.tf                Cloudflare and GitHub providers
+  providers.tf               how they authenticate
+  variables.tf               the agent's name, tokens and usage limits
+  terraform.tfvars.example   example values
+```
+
+## Steps
+
+1. Fill in your values.
+2. Initialize Terraform.
+3. Create the AI Gateway.
+
+### 1. Fill in your values
+
+```bash
+cp terraform.tfvars.example terraform.tfvars
+```
+
+Open:
+
+```txt
+terraform.tfvars
+```
+
+Fill in your values:
+
+```hcl
+# Copy to terraform.tfvars and fill in. Git and the workshop ZIP both
+# leave terraform.tfvars out, because it holds your tokens.
+
+agent_name            = "support-agent"
+cloudflare_account_id = "your-cloudflare-account-id"
+cloudflare_api_token  = "your-cloudflare-api-token"
+github_owner          = "your-github-username"
+github_token          = "your-github-token"
+
+# Optional: hard usage limits.
+# requests_per_minute = 20
+# agent_budget_usd    = 10
+# user_budget_usd     = 1
+```
+
+- `agent_name` names everything the agent gets: its gateway, its Worker and its repository. Pick your own, such as `support-agent`.
+- `cloudflare_account_id` is the Account ID from `npx wrangler whoami`.
+- The two tokens are the ones you created in [Setup](/00-setup).
+
+### 2. Initialize Terraform
+
+```bash
+terraform init
+```
+
+### 3. Create the AI Gateway
+
+Create this file:
+
+```txt
+ai_gateway.tf
+```
+
+Add:
+
+```hcl
+# Every model call the agent makes goes through this gateway.
+resource "cloudflare_ai_gateway" "agent" {
+  account_id = var.cloudflare_account_id
+  id         = var.agent_name
+
+  # End-to-end tracing: log every model call, with its agent_id and user_id.
+  collect_logs = true
+
+  cache_ttl                  = 0
+  cache_invalidate_on_update = true
+
+  # Hard usage limits: a request rate limit across the whole agent.
+  rate_limiting_limit     = var.requests_per_minute
+  rate_limiting_interval  = 60
+  rate_limiting_technique = "sliding"
+
+  # Hard usage limits: a daily budget for the agent, and one for each user.
+  spend_limits = {
+    enabled = true
+    rules = [
+      {
+        # No dimensions: every call through this gateway shares one budget.
+        limit      = var.agent_budget_usd
+        limit_type = "cost"
+        window     = 86400 # one day, in seconds
+        technique  = "sliding"
+      },
+      {
+        # Split by user_id: each user gets a budget of their own.
+        limit      = var.user_budget_usd
+        limit_type = "cost"
+        window     = 86400
+        technique  = "sliding"
+        metadata = {
+          user_id = { mode = "partition" }
+        }
+      },
+    ]
+  }
+}
+
+output "ai_gateway_id" {
+  value = cloudflare_ai_gateway.agent.id
+}
+```
+
+The two spend limit rules are the agent and user budgets. The first has no dimensions, so every call through the agent's gateway shares one budget. The second splits by the `user_id` metadata the agent sends with every call (lesson 01), so each user gets a budget of their own. When a rule is over budget, or the rate limit is hit, the gateway answers `429` and the model is never called.
+
+## Run and verify
+
+```bash
+terraform apply
+```
+
+Review the plan and type `yes`.
+
+In the [Cloudflare dashboard](https://dash.cloudflare.com/), go to **AI** > **AI Gateway** and open the gateway named after your agent. Under **Settings**, check:
+
+- **Rate limiting**: your `requests_per_minute`, per 60 seconds, sliding.
+- **Spend limits**: two rules, one per day for the whole gateway, and one per day per `user_id`.
+
+<Callout type="note" title="Spend limits are eventually consistent">
+A call's cost is counted after it finishes, so a burst of calls can briefly pass a spend limit. The rate limit is exact, which makes it the one to watch fire in lesson 09.
+</Callout>
+
+## Success check
+
+You are ready for the next lesson when:
+
+- `terraform apply` finished with `1 added`.
+- `terraform output ai_gateway_id` prints your agent's name.
+- The gateway's settings show the rate limit and both spend limit rules.
+
+## Next lesson
+
+In the next lesson, you will [create the agent's Worker](/06-worker).

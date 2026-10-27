@@ -1,0 +1,8 @@
+---
+import { getGuidePages } from "../../lib/guide";
+import LessonPlanTable from "./LessonPlanTable";
+
+const lessons = (await getGuidePages()).filter((page) => page.lesson && !page.draft);
+---
+
+<LessonPlanTable lessons={lessons} />

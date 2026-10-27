@@ -1,0 +1,23 @@
+/**
+ * Assets-only Worker: `astro build` writes static HTML to ./dist and
+ * Workers Static Assets serves it, so there is no Worker script (`main`).
+ * https://developers.cloudflare.com/workers/static-assets/
+ */
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "platformcon-sydney-2026-guide",
+	"compatibility_date": "2026-10-27",
+	"assets": {
+		"directory": "./dist",
+		"not_found_handling": "404-page"
+	},
+	"workers_dev": true,
+	"preview_urls": true,
+	"observability": {
+		"enabled": true
+	}
+	// To serve the guide from a hostname on a zone in this account:
+	// "routes": [
+	// 	{ "pattern": "guide.example.com", "custom_domain": true }
+	// ]
+}

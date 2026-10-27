@@ -1,0 +1,129 @@
+---
+title: GitHub Actions
+description: A deploy workflow that ships each agent under its own name, with its own AI Gateway.
+group: template
+lesson: 3
+---
+
+## Goal
+
+Every agent stamped from the template should deploy the same way, under its own name, without anyone editing its code. Add a workflow that builds the template and deploys it as the agent named in the repository's variables.
+
+## Starting point
+
+Continue in the template from lesson 02:
+
+```bash
+cd lab/template
+```
+
+## Steps
+
+1. Create the deploy workflow.
+
+### 1. Create the deploy workflow
+
+Create the workflows folder:
+
+```bash
+mkdir -p .github/workflows
+```
+
+Then create this file:
+
+```txt
+.github/workflows/deploy.yml
+```
+
+Add:
+
+```yaml
+name: Deploy agent
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time per repository; a newer push waits for the last one.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # The template repository has no AGENT_NAME, so only agents stamped from
+    # it by Terraform deploy.
+    if: vars.AGENT_NAME != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      # Identity: one template, many agents. The Worker name, AGENT_ID and
+      # AI_GATEWAY_ID come from repository variables that Terraform sets.
+      - id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            deploy
+            --name ${{ vars.AGENT_NAME }}
+            --var AGENT_ID:${{ vars.AGENT_NAME }}
+            --var AI_GATEWAY_ID:${{ vars.AI_GATEWAY_ID }}
+
+      - name: Summary
+        run: echo "Deployed ${{ vars.AGENT_NAME }} to ${{ steps.deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
+```
+
+What it does:
+
+- Runs on every push to `main`, and on demand (`workflow_dispatch`).
+- Skips the template repository itself: only repositories with an `AGENT_NAME` variable deploy.
+- `--name` deploys the Worker under the agent's name, and the two `--var` flags replace `AGENT_ID` and `AI_GATEWAY_ID` from `wrangler.jsonc`. One template, many agents, and no agent edits its own config.
+- The Cloudflare API token and Account ID come from repository secrets. Terraform sets the secrets and variables in lesson 07.
+
+## Run and verify
+
+The workflow runs on GitHub, but you can run its deploy command locally as a dry run. Build the template, then deploy it as an agent called `my-agent` without uploading anything:
+
+```bash
+pnpm build
+npx wrangler deploy --dry-run --name my-agent --var AGENT_ID:my-agent --var AI_GATEWAY_ID:my-agent
+```
+
+Wrangler lists the bindings the agent would get, then stops:
+
+```txt
+Your Worker has access to the following bindings:
+Binding                             Resource
+env.Agent (Agent)                   Durable Object
+env.AI                              AI
+env.AGENT_ID ("(hidden)")           Environment Variable
+env.AI_GATEWAY_ID ("(hidden)")      Environment Variable
+env.LOADER                          Worker Loader
+--dry-run: exiting now.
+```
+
+## Success check
+
+You are ready for the next lesson when:
+
+- `.github/workflows/deploy.yml` exists.
+- The dry run lists `env.AGENT_ID` and `env.AI_GATEWAY_ID`, and exits without deploying.
+
+## Next lesson
+
+In the next lesson, you will [push the template to GitHub](/04-template-repo) and make it a template repository.

@@ -1,0 +1,107 @@
+---
+title: Component kit
+description: Dev-only fixture for checking MDX components and prose styles. Never built for production.
+sidebarLabel: Component kit
+group: get-started
+draft: true
+---
+
+Paragraph with **bold**, _emphasis_, `inline code`, a [link](/00-setup) and <kbd>⌘K</kbd>.
+
+Second paragraph to check spacing between paragraphs.
+
+## Heading level 2
+
+### Heading level 3
+
+- Unordered item
+- Unordered item with `code`
+
+1. Ordered item
+2. Ordered item
+
+> Blockquote text.
+
+| Column | Column |
+| ------ | ------ |
+| Cell   | Cell   |
+| Cell   | Cell   |
+
+---
+
+## Code blocks
+
+```bash
+pnpm install
+pnpm dev
+```
+
+```ts
+export default {
+  async fetch(request, env) {
+    return new Response("ok");
+  },
+} satisfies ExportedHandler<Env>;
+```
+
+```jsonc
+{
+  // Comment
+  "name": "example",
+}
+```
+
+```hcl
+resource "cloudflare_workers_script" "example" {
+  account_id  = var.account_id
+  script_name = "example"
+}
+```
+
+```yaml
+on:
+  push:
+    branches: [main]
+```
+
+```
+Plain text block without a language.
+```
+
+## Callouts
+
+<Callout type="note" title="Note">
+Callout body with `inline code` and a [link](/00-setup).
+</Callout>
+
+<Callout type="tip" title="Tip">
+Callout body.
+
+Second paragraph.
+</Callout>
+
+<Callout type="warning" title="Warning">
+Callout body.
+</Callout>
+
+<Callout type="danger">
+Callout without a title.
+</Callout>
+
+## Details
+
+<Details summary="Collapsed by default">
+Hidden content stays in the HTML so search can index it.
+
+```bash
+echo "code inside details"
+```
+</Details>
+
+<Details summary="Open by default" open>
+Visible content.
+</Details>
+
+## Lesson plan
+
+<LessonPlan />

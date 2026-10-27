@@ -1,0 +1,68 @@
+---
+title: Wrap-up
+description: Watch each control fire, the three adoption metrics, and what to take home.
+group: ship
+lesson: 9
+---
+
+## Watch the controls fire
+
+Use your deployed agent. Each row makes one default fire, and shows where the evidence lives.
+
+| Default | Make it fire | Where to look |
+| --- | --- | --- |
+| Its own identity | Open your agent in a second browser, or select **Switch to a new user**. | Each user gets their own Durable Object and workspace. In your gateway's **Logs**, filter by `user_id`. |
+| Scoped access to tools | Send **Delete a file**, then **Fetch a URL** and approve the `exec` call. | There is no `delete` tool, and `fetch()` fails inside `exec`. |
+| Approval gates before write actions | Send **Write a file**, and reject it. | The agent says the write wasn't approved, and the file doesn't exist. |
+| Hard usage limits | Set `requests_per_minute = 2` in `terraform.tfvars`, run `terraform apply`, then send a few messages quickly. | The gateway answers `429`. The agent retries with backoff, then shows the error. Your gateway's **Logs** show the blocked calls. |
+| End-to-end tracing | Send any message. | Your Worker's **Observability** shows the trace. Your gateway's **Logs** show the prompt, the response and their cost. |
+
+Set `requests_per_minute` back and apply again when you are done.
+
+## Adoption metrics
+
+A golden path is only worth something if teams use it. Track these three from day one.
+
+1. **Time to first agent.** From "I need an agent" to a deployed one. Today it was one `terraform apply` and one workflow run. Measure it from the agent repository's creation to its first green deploy.
+2. **Share of agents built from the template.** Agents with the `golden-path` tag, out of all the Workers that call a model. Repositories generated from `agent-template` tell the same story on GitHub.
+3. **Share of agents with all five controls on.** For each agent, check one signal per control:
+
+| Default | Signal |
+| --- | --- |
+| Its own identity | Its gateway's logs carry `agent_id` and `user_id` |
+| Scoped access to tools | The code has a `TOOLS` allowlist |
+| Approval gates before write actions | The code has an `APPROVAL_REQUIRED` list |
+| Hard usage limits | Its gateway has a rate limit and spend limits, and its Worker has `limits.cpu_ms` |
+| End-to-end tracing | Its Worker has traces turned on |
+
+The first metric tells you whether the path is fast. The second tells you whether teams choose it. The third tells you whether the controls survive contact with real teams.
+
+## Take it home
+
+### The golden path contract
+
+Whatever platform you build on, every agent should get these five by default:
+
+1. **Its own identity.** Every agent is distinct, and every model call says which agent and which user made it.
+2. **Scoped access to tools.** An agent only gets the tools it is allowed, and code it runs is sandboxed.
+3. **Approval gates before write actions.** Write actions wait for a person.
+4. **Hard usage limits.** Every agent, and every user, has a budget and a rate limit, enforced outside the agent.
+5. **End-to-end tracing.** Every request, tool call and model call is traced and attributable.
+
+### Adapt it
+
+- Change what an agent may do: edit `TOOLS` and `APPROVAL_REQUIRED` in `src/server.ts`.
+- Approve from somewhere else: anything that can call `resolve()` on the gate can approve, such as a Slack button or a review queue.
+- Stamp many agents: move the Terraform into a module and use `for_each` over a list of agent names.
+- Move `agent-template` into your GitHub organization, so every team starts from the same place.
+
+### Clean up
+
+From `lab/terraform`:
+
+```bash
+terraform destroy
+gh repo delete agent-template
+```
+
+Deleting repositories needs the `delete_repo` scope. Add it with `gh auth refresh --scopes delete_repo`.

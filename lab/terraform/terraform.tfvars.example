@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and fill in. Git and the workshop ZIP both
+# leave terraform.tfvars out, because it holds your tokens.
+
+agent_name            = "support-agent"
+cloudflare_account_id = "your-cloudflare-account-id"
+cloudflare_api_token  = "your-cloudflare-api-token"
+github_owner          = "your-github-username"
+github_token          = "your-github-token"
+
+# Optional: hard usage limits.
+# requests_per_minute = 20
+# agent_budget_usd    = 10
+# user_budget_usd     = 1

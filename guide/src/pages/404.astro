@@ -1,0 +1,18 @@
+---
+import { LinkButton } from "@cloudflare/kumo/components/button";
+import SiteNav from "../components/SiteNav";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getGuidePages, groupPages } from "../lib/guide";
+
+const pages = await getGuidePages();
+---
+
+<BaseLayout title="Page not found">
+  <SiteNav client:load groups={groupPages(pages)} currentPath="/404">
+    <div class="flex flex-col items-center gap-3 px-6 py-24 text-center">
+      <p class="text-sm font-medium text-kumo-subtle">404</p>
+      <h1 class="text-3xl font-semibold text-kumo-default">Page not found</h1>
+      <LinkButton href="/" variant="primary" className="mt-3">Back to the overview</LinkButton>
+    </div>
+  </SiteNav>
+</BaseLayout>

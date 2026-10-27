@@ -1,0 +1,62 @@
+---
+import type { MarkdownHeading } from "astro";
+import OnThisPage from "../components/OnThisPage";
+import PrevNext from "../components/PrevNext.astro";
+import SiteNav from "../components/SiteNav";
+import {
+  formatLesson,
+  type GuideEntry,
+  getGuidePages,
+  getPrevNext,
+  groupPages,
+  hrefFor,
+} from "../lib/guide";
+import { groupLabels } from "../site.config";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  entry: GuideEntry;
+  headings: MarkdownHeading[];
+}
+
+const { entry, headings } = Astro.props;
+const { title, description, group, lesson } = entry.data;
+const pages = await getGuidePages();
+const { prev, next } = getPrevNext(pages, entry.id);
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+---
+
+<BaseLayout title={title} description={description}>
+  <SiteNav client:load groups={groupPages(pages)} currentPath={hrefFor(entry.id)}>
+    <div class="mx-auto flex w-full max-w-6xl gap-12 px-5 pt-8 pb-16 md:px-10 md:pt-10">
+      <article
+        class="max-w-3xl min-w-0 flex-1"
+        data-pagefind-body
+        data-pagefind-meta={`group:${groupLabels[group]}`}
+      >
+        <header class="mb-8">
+          {
+            lesson !== undefined && (
+              <p class="mb-2 text-sm font-medium text-kumo-subtle">Lesson {formatLesson(lesson)}</p>
+            )
+          }
+          <h1 class="text-3xl font-semibold text-kumo-default">{title}</h1>
+          {description && <p class="mt-3 text-base text-kumo-subtle">{description}</p>}
+        </header>
+        <div class="kumo-prose prose prose-sm max-w-none">
+          <slot />
+        </div>
+        <PrevNext prev={prev} next={next} />
+      </article>
+      {
+        toc.length > 0 && (
+          <div class="hidden w-56 shrink-0 xl:block">
+            <div class="sticky top-24 max-h-[calc(100svh-7rem)] overflow-y-auto">
+              <OnThisPage client:idle headings={toc} />
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </SiteNav>
+</BaseLayout>

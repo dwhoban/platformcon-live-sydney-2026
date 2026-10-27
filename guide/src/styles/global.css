@@ -1,0 +1,156 @@
+@source "../../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles";
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+}
+
+html {
+  /* Keeps anchor targets clear of the sticky 58px header. */
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* The server renders the desktop sidebar. Hide it on small screens until
+   React hydrates and swaps in the mobile sheet. */
+@media (max-width: 767px) {
+  aside[data-sidebar="sidebar"] {
+    display: none;
+  }
+}
+
+/* Tailwind Typography mapped to Kumo tokens. The tokens use light-dark(),
+   so one set covers both modes. */
+.kumo-prose {
+  --tw-prose-body: var(--text-color-kumo-default);
+  --tw-prose-headings: var(--text-color-kumo-default);
+  --tw-prose-lead: var(--text-color-kumo-subtle);
+  --tw-prose-links: var(--text-color-kumo-link);
+  --tw-prose-bold: var(--text-color-kumo-strong);
+  --tw-prose-counters: var(--text-color-kumo-subtle);
+  --tw-prose-bullets: var(--text-color-kumo-subtle);
+  --tw-prose-hr: var(--color-kumo-hairline);
+  --tw-prose-quotes: var(--text-color-kumo-default);
+  --tw-prose-quote-borders: var(--color-kumo-brand);
+  --tw-prose-captions: var(--text-color-kumo-subtle);
+  --tw-prose-kbd: var(--text-color-kumo-default);
+  --tw-prose-code: var(--text-color-kumo-default);
+  --tw-prose-th-borders: var(--color-kumo-line);
+  --tw-prose-td-borders: var(--color-kumo-hairline);
+}
+
+.kumo-prose :where(h1, h2, h3, h4):not(:where(.not-prose, .not-prose *)) {
+  font-weight: 600;
+}
+
+.kumo-prose :where(a):not(:where(.not-prose, .not-prose *)) {
+  text-decoration: none;
+}
+
+.kumo-prose :where(a):not(:where(.not-prose, .not-prose *)):hover {
+  text-decoration: underline;
+}
+
+.kumo-prose :where(blockquote):not(:where(.not-prose, .not-prose *)) {
+  font-style: normal;
+}
+
+.kumo-prose :where(blockquote p):not(:where(.not-prose, .not-prose *))::before,
+.kumo-prose :where(blockquote p):not(:where(.not-prose, .not-prose *))::after {
+  content: none;
+}
+
+.kumo-prose :where(kbd):not(:where(.not-prose, .not-prose *)) {
+  border: 1px solid var(--color-kumo-line);
+  background-color: var(--color-kumo-control);
+  box-shadow: none;
+}
+
+/* Inline code, in prose and in callouts (which opt out of prose). */
+:where(.kumo-prose, .callout) :where(code):not(:where(pre code)) {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-kumo-hairline);
+  border-radius: 0.25rem;
+  background-color: var(--color-kumo-recessed);
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+.kumo-prose :where(code):not(:where(pre code))::before,
+.kumo-prose :where(code):not(:where(pre code))::after {
+  content: none;
+}
+
+.callout :where(p + p, p + ul, p + ol, ul + p, ol + p) {
+  margin-top: 0.5rem;
+}
+
+.callout :where(ul) {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.callout :where(ol) {
+  padding-left: 1.25rem;
+  list-style-type: decimal;
+}
+
+.callout :where(a) {
+  color: var(--text-color-kumo-link);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+/* Permalink added to h2/h3 by the Heading MDX component. */
+.heading-anchor {
+  margin-left: 0.375em;
+  color: var(--text-color-kumo-subtle);
+  font-weight: 500;
+  text-decoration: none;
+  opacity: 0;
+}
+
+.kumo-prose :where(h2, h3):hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+.kumo-prose .heading-anchor:hover {
+  color: var(--text-color-kumo-link);
+  text-decoration: none;
+}
+
+/* Trim prose margins at the edges of island slots, such as Details panels. */
+.kumo-prose astro-slot > :first-child {
+  margin-top: 0;
+}
+
+.kumo-prose astro-slot > :last-child {
+  margin-bottom: 0;
+}
+
+/* Shiki emits both themes as CSS variables (`defaultColor: false`). */
+.astro-code {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.astro-code span {
+  color: var(--shiki-light);
+}
+
+[data-mode="dark"] .astro-code {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+[data-mode="dark"] .astro-code span {
+  color: var(--shiki-dark);
+}

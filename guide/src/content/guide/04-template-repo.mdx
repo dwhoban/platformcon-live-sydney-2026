@@ -1,0 +1,87 @@
+---
+title: "Template repo & push"
+description: Push the template to GitHub and mark it as a template repository.
+group: template
+lesson: 4
+---
+
+## Goal
+
+Publish the template so the platform can stamp agents from it: push it to GitHub, and mark the repository as a template.
+
+## Starting point
+
+Continue in the template from lesson 03:
+
+```bash
+cd lab/template
+```
+
+## Steps
+
+1. Commit the template.
+2. Create the repository and push.
+3. Mark it as a template.
+
+### 1. Commit the template
+
+```bash
+git init -b main
+git add .
+git commit -m "Agent template"
+```
+
+`.gitignore` keeps `node_modules`, `dist` and `.wrangler` out of the commit.
+
+### 2. Create the repository and push
+
+```bash
+gh repo create agent-template --private --source . --push
+```
+
+Keep the name `agent-template`: the Terraform module looks for it in lesson 07.
+
+<Callout type="warning" title="Push refused?">
+If the push fails with `refusing to allow an OAuth App to create or update workflow`, your GitHub login is missing the `workflow` scope. Run `gh auth refresh --scopes workflow`, then `git push -u origin main`.
+</Callout>
+
+### 3. Mark it as a template
+
+```bash
+gh repo edit --template
+```
+
+## Run and verify
+
+```bash
+gh repo view --json name,isTemplate,visibility
+```
+
+You should see:
+
+```txt
+{
+  "isTemplate": true,
+  "name": "agent-template",
+  "visibility": "PRIVATE"
+}
+```
+
+Open the repository on GitHub:
+
+```bash
+gh repo view --web
+```
+
+On the **Actions** tab, **Deploy agent** has already run once, for your push, and skipped its deploy job: the template repository has no `AGENT_NAME` variable.
+
+## Success check
+
+You are ready for the next lesson when:
+
+- `gh repo view` shows `"isTemplate": true`.
+- The first **Deploy agent** run skipped its deploy job.
+
+## Next lesson
+
+From here on you are the platform team. In the next lesson, you will start the Terraform module and give your agent [its own AI Gateway](/05-ai-gateway).
