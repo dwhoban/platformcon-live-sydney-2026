@@ -34,7 +34,8 @@ Each change in this lesson goes where a `// Lesson 01` comment is, in `wrangler.
 3. Turn on tracing.
 4. Generate types.
 5. Route model calls through AI Gateway.
-6. Show the agent's identity in the UI.
+6. Tag every model request.
+7. Show the agent's identity in the UI.
 
 ### 1. Give the agent an identity
 
@@ -207,21 +208,36 @@ Find these lines:
 Replace them with:
 
 ```ts
-  // Identity: every model call goes through this agent's AI Gateway and
-  // says which agent and which user made it.
-  readonly ai = createAI({
-    binding: this.env.AI,
-    id: this.env.AI_GATEWAY_ID,
-    metadata: {
-      agent_id: this.env.AGENT_ID,
-      user_id: this.ctx.id.name ?? this.ctx.id.toString()
-    }
-  });
+  // Identity: every model call goes through this agent's AI Gateway.
+  readonly ai = createAI({ binding: this.env.AI, id: this.env.AI_GATEWAY_ID });
 ```
 
-`createAI` sends the gateway id and the metadata with every model call through the `AI` binding. The binding is already authenticated, so there is no gateway token to manage. `this.ctx.id.name` is the name the Durable Object was created with: the user id from the URL `/agents/agent/<user>`.
+`createAI` sends every model call through the `AI` binding to the gateway named in `AI_GATEWAY_ID`. The binding is already authenticated, so there is no gateway token to manage.
 
-### 6. Show the agent's identity in the UI
+### 6. Tag every model request
+
+Find this line:
+
+```ts
+            // Lesson 01: tag every model request with the agent and the user.
+```
+
+Replace it with:
+
+```ts
+            // Identity: every model request carries the agent and the user,
+            // which AI Gateway records as metadata on its log.
+            stream: {
+              metadata: {
+                agent_id: this.env.AGENT_ID,
+                user_id: this.ctx.id.name ?? this.ctx.id.toString()
+              }
+            },
+```
+
+`stream` holds the options Pi sends with each model request. AI Gateway records `metadata` on the request's log, so every call says which agent and which user made it. `this.ctx.id.name` is the name the Durable Object was created with: the user id from the URL `/agents/agent/<user>`.
+
+### 7. Show the agent's identity in the UI
 
 Find this line:
 
@@ -268,16 +284,8 @@ const PREAMBLE =
 
 /** One agent instance per user, backed by one Durable Object. */
 export class Agent extends DurableObject<Env> {
-  // Identity: every model call goes through this agent's AI Gateway and
-  // says which agent and which user made it.
-  readonly ai = createAI({
-    binding: this.env.AI,
-    id: this.env.AI_GATEWAY_ID,
-    metadata: {
-      agent_id: this.env.AGENT_ID,
-      user_id: this.ctx.id.name ?? this.ctx.id.toString()
-    }
-  });
+  // Identity: every model call goes through this agent's AI Gateway.
+  readonly ai = createAI({ binding: this.env.AI, id: this.env.AI_GATEWAY_ID });
   // A durable filesystem on the object's SQLite, beside pi's own tables.
   // `exec` runs JavaScript modules in a fresh Dynamic Worker per call, with
   // no network of its own. `git` turns on `workspace.git`, which the `ws:git`
@@ -315,6 +323,14 @@ export class Agent extends DurableObject<Env> {
           registry: this.registry,
           onWake,
           settings: {
+            // Identity: every model request carries the agent and the user,
+            // which AI Gateway records as metadata on its log.
+            stream: {
+              metadata: {
+                agent_id: this.env.AGENT_ID,
+                user_id: this.ctx.id.name ?? this.ctx.id.toString()
+              }
+            },
             // pi doubles the delay before each retry: 1, 2, 4, 8 and 16 seconds,
             // so a rate-limited model gets about 30 seconds to recover.
             retry: { enabled: true, maxRetries: 5, baseDelayMs: 1000 }

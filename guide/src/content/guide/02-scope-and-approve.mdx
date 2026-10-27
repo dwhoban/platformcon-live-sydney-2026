@@ -260,16 +260,8 @@ const PREAMBLE =
 
 /** One agent instance per user, backed by one Durable Object. */
 export class Agent extends DurableObject<Env> {
-  // Identity: every model call goes through this agent's AI Gateway and
-  // says which agent and which user made it.
-  readonly ai = createAI({
-    binding: this.env.AI,
-    id: this.env.AI_GATEWAY_ID,
-    metadata: {
-      agent_id: this.env.AGENT_ID,
-      user_id: this.ctx.id.name ?? this.ctx.id.toString()
-    }
-  });
+  // Identity: every model call goes through this agent's AI Gateway.
+  readonly ai = createAI({ binding: this.env.AI, id: this.env.AI_GATEWAY_ID });
   // A durable filesystem on the object's SQLite, beside pi's own tables.
   // `exec` runs JavaScript modules in a fresh Dynamic Worker per call, with
   // no network of its own. `git` turns on `workspace.git`, which the `ws:git`
@@ -310,6 +302,14 @@ export class Agent extends DurableObject<Env> {
           registry: this.registry,
           onWake,
           settings: {
+            // Identity: every model request carries the agent and the user,
+            // which AI Gateway records as metadata on its log.
+            stream: {
+              metadata: {
+                agent_id: this.env.AGENT_ID,
+                user_id: this.ctx.id.name ?? this.ctx.id.toString()
+              }
+            },
             // pi doubles the delay before each retry: 1, 2, 4, 8 and 16 seconds,
             // so a rate-limited model gets about 30 seconds to recover.
             retry: { enabled: true, maxRetries: 5, baseDelayMs: 1000 }

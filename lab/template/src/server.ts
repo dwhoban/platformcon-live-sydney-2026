@@ -60,6 +60,7 @@ export class Agent extends DurableObject<Env> {
           registry: this.registry,
           onWake,
           settings: {
+            // Lesson 01: tag every model request with the agent and the user.
             // pi doubles the delay before each retry: 1, 2, 4, 8 and 16 seconds,
             // so a rate-limited model gets about 30 seconds to recover.
             retry: { enabled: true, maxRetries: 5, baseDelayMs: 1000 }
