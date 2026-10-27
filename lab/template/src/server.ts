@@ -12,7 +12,7 @@ import { createAI } from "agents/models/pi-ai";
 import { WebSockets } from "agents/websockets";
 import { PiSessionSockets } from "./sockets";
 import { createWorkspaceTools, JAVASCRIPT_BACKEND } from "./workspace";
-// Lesson 02: scope the tools and gate write actions here.
+// Lesson 04: scope the tools and gate write actions here.
 
 const MODEL_ID = "@cf/zai-org/glm-5.3-flash";
 
@@ -21,7 +21,7 @@ const PREAMBLE =
 
 /** One agent instance per user, backed by one Durable Object. */
 export class Agent extends DurableObject<Env> {
-  // Lesson 01: route model calls through this agent's AI Gateway.
+  // Lesson 03: route model calls through this agent's AI Gateway.
   readonly ai = createAI({ binding: this.env.AI });
   // A durable filesystem on the object's SQLite, beside pi's own tables.
   // `exec` runs JavaScript modules in a fresh Dynamic Worker per call, with
@@ -43,7 +43,7 @@ export class Agent extends DurableObject<Env> {
   readonly registry = createRegistry();
   readonly harness = new PiHarness({
     harness: async ({ storage, context, onWake }) => {
-      // Lesson 02: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
+      // Lesson 04: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
       const tools = createWorkspaceTools(this.workspace);
       // pi's own extension: the system prompt and the tools.
       this.registry.install({
@@ -60,7 +60,7 @@ export class Agent extends DurableObject<Env> {
           registry: this.registry,
           onWake,
           settings: {
-            // Lesson 01: tag every model request with the agent and the user.
+            // Lesson 03: tag every model request with the agent and the user.
             // pi doubles the delay before each retry: 1, 2, 4, 8 and 16 seconds,
             // so a rate-limited model gets about 30 seconds to recover.
             retry: { enabled: true, maxRetries: 5, baseDelayMs: 1000 }
@@ -74,7 +74,7 @@ export class Agent extends DurableObject<Env> {
   });
 
   // App glue, not the harness: how this app puts sessions on a socket.
-  // Lesson 02: create the approval gate and hand it to the sockets.
+  // Lesson 04: create the approval gate and hand it to the sockets.
   readonly sockets = new PiSessionSockets(
     this.harness,
     this.registry,
@@ -93,7 +93,7 @@ export class Agent extends DurableObject<Env> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    // Lesson 01: tell the client who this agent is.
+    // Lesson 03: tell the client who this agent is.
     try {
       return (
         (await routeAgentRequest(request, env, { cors: true })) ??

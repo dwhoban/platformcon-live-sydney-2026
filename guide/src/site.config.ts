@@ -4,8 +4,7 @@ export const site = {
   description: "5 defaults every agent needs: build an agent golden path on Cloudflare",
   sessionUrl:
     "https://sydney.platformcon.com/sessions/5-defaults-every-agent-needs-build-an-agent-golden-path-on-cloudflare",
-  // TODO: point at the public workshop repository.
-  repoUrl: "https://github.com/OWNER/REPO",
+  repoUrl: "https://github.com/dwhoban/platformcon-live-sydney-2026",
   downloadUrl: "/downloads/lab.zip",
 } as const;
 
@@ -24,13 +23,13 @@ export const navLinks: NavLink[] = [
 ];
 
 /** Sidebar groups, in reading order. */
-export const groupIds = ["get-started", "template", "terraform", "ship"] as const;
+export const groupIds = ["get-started", "provision", "template", "ship"] as const;
 
 export type GroupId = (typeof groupIds)[number];
 
 export const groupLabels: Record<GroupId, string> = {
   "get-started": "Get started",
+  provision: "Provision the agent",
   template: "Build the template",
-  terraform: "Provision with Terraform",
   ship: "Ship it",
 };

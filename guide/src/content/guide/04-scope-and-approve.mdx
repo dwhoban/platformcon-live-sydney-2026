@@ -2,12 +2,12 @@
 title: "Scoped tools & approvals"
 description: A tool allowlist, and an approval gate that holds write actions until a person approves them.
 group: template
-lesson: 2
+lesson: 4
 ---
 
 ## Goal
 
-In lesson 01 the agent wrote a file the moment the model asked. It is offered every workspace tool, `delete` included, and nothing stands between the model and a write.
+In lesson 03 the agent wrote a file the moment the model asked. It is offered every workspace tool, `delete` included, and nothing stands between the model and a write.
 
 Add two defaults:
 
@@ -16,7 +16,7 @@ Add two defaults:
 
 ## Starting point
 
-Continue in the template from lesson 01:
+Continue in the template from lesson 03:
 
 ```bash
 cd lab/template
@@ -158,7 +158,7 @@ src/server.ts
 Find this line:
 
 ```ts
-// Lesson 02: scope the tools and gate write actions here.
+// Lesson 04: scope the tools and gate write actions here.
 ```
 
 Replace it with:
@@ -179,7 +179,7 @@ const APPROVAL_REQUIRED = ["write", "edit", "exec"];
 Find these lines:
 
 ```ts
-      // Lesson 02: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
+      // Lesson 04: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
       const tools = createWorkspaceTools(this.workspace);
 ```
 
@@ -204,7 +204,7 @@ The filter is the scope. A tool that isn't in `TOOLS` is never registered, so th
 Find these lines:
 
 ```ts
-  // Lesson 02: create the approval gate and hand it to the sockets.
+  // Lesson 04: create the approval gate and hand it to the sockets.
   readonly sockets = new PiSessionSockets(
     this.harness,
     this.registry,
@@ -397,4 +397,4 @@ You are ready for the next lesson when:
 
 ## Next lesson
 
-The template's code and config are done. In the next lesson, you will add [a GitHub Actions workflow](/03-github-actions) that deploys every agent stamped from it.
+The template's code and config are done. In the next lesson, you will add [a GitHub Actions workflow](/05-github-actions) that deploys every agent stamped from it.

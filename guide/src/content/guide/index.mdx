@@ -11,9 +11,9 @@ In this workshop you build a golden path for agents, then stamp out an agent wit
 
 ## What you'll build
 
-- **An agent template.** A chat agent on Cloudflare Workers: the [Pi harness](https://developers.cloudflare.com/agents/) from the Agents SDK, running on a Durable Object, with a durable workspace it can read, write and run JavaScript in. You add the controls to it in lessons 01–04.
-- **A Terraform module that stamps agents.** Given one agent name, it creates the agent's AI Gateway, its Worker, and its GitHub repository from the template, with deploy secrets. You build it in lessons 05–07.
-- **A deployed agent.** One workflow run later, your agent is live on workers.dev with all five controls on.
+- **A Terraform module that stamps agents.** Given one agent name, it creates the agent's AI Gateway and Worker (lessons 01–02), then its GitHub repository from the template, with deploy secrets (lesson 07).
+- **An agent template.** A chat agent on Cloudflare Workers: the [Pi harness](https://developers.cloudflare.com/agents/) from the Agents SDK, running on a Durable Object, with a durable workspace it can read, write and run JavaScript in. You add the controls to it in lessons 03–06.
+- **A deployed agent.** The same `terraform apply` that stamps its repository ships it: your agent is live on workers.dev with all five controls on.
 
 Final app UI:
 
@@ -23,11 +23,11 @@ Final app UI:
 
 | Default | What it means | How Cloudflare provides it | Lessons |
 | --- | --- | --- | --- |
-| Its own identity | Every agent, and every user of it, is distinct and named | Its own Worker and AI Gateway, a Durable Object per user, and `agent_id` and `user_id` on every model call | 01, 05, 06 |
-| Scoped access to tools | The agent only gets the tools you allow, and code it runs can't reach the network | A tool allowlist, and `exec` running in a Dynamic Worker with no internet access | 02 |
-| Approval gates before write actions | Write actions wait for a person | The Durable Object holds the call open; Approve and Reject travel over a WebSocket | 02 |
-| Hard usage limits | A ceiling the agent can't spend past | AI Gateway rate limit and spend limits per agent and per user, plus a CPU limit per request | 01, 05 |
-| End-to-end tracing | You can see what the agent did, call by call | Workers Logs and Traces, and AI Gateway logs you can filter by `agent_id` and `user_id` | 01 |
+| Its own identity | Every agent, and every user of it, is distinct and named | Its own Worker and AI Gateway, a Durable Object per user, and `agent_id` and `user_id` on every model call | 01, 02, 03, 07 |
+| Scoped access to tools | The agent only gets the tools you allow, and code it runs can't reach the network | A tool allowlist, and `exec` running in a Dynamic Worker with no internet access | 04 |
+| Approval gates before write actions | Write actions wait for a person | The Durable Object holds the call open; Approve and Reject travel over a WebSocket | 04 |
+| Hard usage limits | A ceiling the agent can't spend past | AI Gateway rate limit and spend limits per agent and per user, plus a CPU limit per request | 01, 03 |
+| End-to-end tracing | You can see what the agent did, call by call | Workers Logs and Traces, and AI Gateway logs you can filter by `agent_id` and `user_id` | 03 |
 
 ## What you'll leave with
 

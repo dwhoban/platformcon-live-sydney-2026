@@ -17,7 +17,6 @@ Static Astro + MDX site for the workshop, styled with Kumo and served by an asse
 - `lab/` is zipped into `public/downloads/lab.zip` when `pnpm dev` starts and on every build. Restart dev to pick up lab changes. Exclusions are in `integrations/lab-zip.ts`.
 - Callouts opt out of prose styles, so their inner content is styled by the `.callout` rules in `src/styles/global.css`.
 - The theme is `data-mode` on `<html>`. `localStorage.theme` stores `light`, `dark` or `system`. The inline script in `BaseLayout.astro` applies it before first paint, and `ThemeToggle.tsx` mirrors that logic.
-- `site.repoUrl` in `src/site.config.ts` is a placeholder until the public repo exists.
 
 ## UI conventions
 

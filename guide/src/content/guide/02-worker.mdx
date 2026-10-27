@@ -1,8 +1,8 @@
 ---
 title: Worker
 description: The agent's Worker, created by the platform, on workers.dev and tagged golden-path.
-group: terraform
-lesson: 6
+group: provision
+lesson: 2
 ---
 
 ## Goal
@@ -11,7 +11,7 @@ Create the agent's Worker as a platform resource: named after the agent, on work
 
 ## Starting point
 
-Continue in the Terraform folder from lesson 05:
+Continue in the Terraform folder from lesson 01:
 
 ```bash
 cd lab/terraform
@@ -55,7 +55,7 @@ output "worker_url" {
 `cloudflare_worker` is the Worker itself, with no code. On the first deploy, Wrangler uploads the code, the bindings and the Durable Object migration. Terraform and Wrangler each own one part, so they never fight over versions.
 
 <Callout type="tip" title="Short on time?">
-Skip this lesson. Wrangler creates the Worker on the first deploy, and the workflow's summary prints its URL. You lose the `golden-path` tag.
+Skip this lesson. Wrangler creates the Worker on the first deploy in lesson 07, and the workflow's summary prints its URL. You lose the `golden-path` tag.
 </Callout>
 
 ## Run and verify
@@ -76,4 +76,4 @@ You are ready for the next lesson when:
 
 ## Next lesson
 
-In the next lesson, you will [stamp the agent's repository](/07-repo-secrets) from the template.
+The agent has a gateway and a Worker, but no code. In the next lesson, you will [configure the agent template](/03-template-config) to use them.

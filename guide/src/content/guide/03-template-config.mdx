@@ -2,30 +2,30 @@
 title: "AI Gateway & config"
 description: Identity, a CPU limit and tracing in wrangler.jsonc, and every model call routed through AI Gateway.
 group: template
-lesson: 1
+lesson: 3
 ---
 
 ## Goal
 
-Give the template three of its five defaults. Right now the agent calls Workers AI directly, nothing records which agent or which user made a call, nothing caps the work one request can do, and once it is deployed you have no traces.
+The agent has a gateway and a Worker. Now give the template three of its five defaults. Right now the agent calls Workers AI directly, nothing records which agent or which user made a call, nothing caps the work one request can do, and once it is deployed you have no traces.
 
 By the end of this lesson:
 
-- every model call goes through AI Gateway and carries `agent_id` and `user_id`
+- every model call goes through your agent's AI Gateway, with its limits, and carries `agent_id` and `user_id`
 - every request has a CPU ceiling
 - every request, Durable Object call and model call is traced
 
 ## Starting point
 
-Use the template from the lab folder:
+Switch from the Terraform folder to the template:
 
 ```bash
-cd lab/template
+cd ../template
 ```
 
 The agent is a Durable Object class called `Agent` in `src/server.ts`. Each browser gets its own user id, and each user gets their own `Agent` instance, so one deployment serves many users, each with private state.
 
-Each change in this lesson goes where a `// Lesson 01` comment is, in `wrangler.jsonc` and `src/server.ts`.
+Each change in this lesson goes where a `// Lesson 03` comment is, in `wrangler.jsonc` and `src/server.ts`.
 
 ## Steps
 
@@ -48,29 +48,28 @@ wrangler.jsonc
 Find this line:
 
 ```jsonc
-	// Lesson 01: identity goes here.
+	// Lesson 03: identity goes here.
 ```
 
-Replace it with:
+Replace it with the block below, then change both `support-agent` values to the `agent_name` from your `terraform.tfvars`:
 
 ```jsonc
 	// Identity: who this agent is, and which AI Gateway its model calls use.
-	// "default" is created on first use. CI replaces both with the agent's
-	// own name and gateway.
+	// The deploy workflow replaces both for every agent it ships.
 	"vars": {
-		"AGENT_ID": "agent-template",
-		"AI_GATEWAY_ID": "default"
+		"AGENT_ID": "support-agent",
+		"AI_GATEWAY_ID": "support-agent"
 	},
 ```
 
-`vars` become environment variables on the Worker: `env.AGENT_ID` and `env.AI_GATEWAY_ID`. Until your agent gets its own gateway in lesson 05, its model calls use your account's `default` gateway, which AI Gateway creates on the first call.
+`vars` become environment variables on the Worker: `env.AGENT_ID` and `env.AI_GATEWAY_ID`. Locally, the template runs as your agent, through the gateway you created in lesson 01. When the deploy workflow ships an agent, it replaces both values with that agent's name and gateway.
 
 ### 2. Cap CPU time per request
 
 Find this line:
 
 ```jsonc
-	// Lesson 01: usage limits go here.
+	// Lesson 03: usage limits go here.
 ```
 
 Replace it with:
@@ -83,14 +82,14 @@ Replace it with:
 	},
 ```
 
-The limit counts CPU time, not wall time: waiting for the model or for an approval costs nothing. The agent's spend and rate limits come in lesson 05.
+The limit counts CPU time, not wall time: waiting for the model or for an approval costs nothing. The agent's spend and rate limits live on its gateway, from lesson 01.
 
 ### 3. Turn on tracing
 
 Find this line:
 
 ```jsonc
-	// Lesson 01: tracing goes here.
+	// Lesson 03: tracing goes here.
 ```
 
 Replace it with:
@@ -124,11 +123,10 @@ That is all the tracing code there is. The Workers runtime traces every request,
 		"nodejs_compat"
 	],
 	// Identity: who this agent is, and which AI Gateway its model calls use.
-	// "default" is created on first use. CI replaces both with the agent's
-	// own name and gateway.
+	// The deploy workflow replaces both for every agent it ships.
 	"vars": {
-		"AGENT_ID": "agent-template",
-		"AI_GATEWAY_ID": "default"
+		"AGENT_ID": "support-agent",
+		"AI_GATEWAY_ID": "support-agent"
 	},
 	"ai": {
 		"binding": "AI",
@@ -201,7 +199,7 @@ src/server.ts
 Find these lines:
 
 ```ts
-  // Lesson 01: route model calls through this agent's AI Gateway.
+  // Lesson 03: route model calls through this agent's AI Gateway.
   readonly ai = createAI({ binding: this.env.AI });
 ```
 
@@ -219,7 +217,7 @@ Replace them with:
 Find this line:
 
 ```ts
-            // Lesson 01: tag every model request with the agent and the user.
+            // Lesson 03: tag every model request with the agent and the user.
 ```
 
 Replace it with:
@@ -242,7 +240,7 @@ Replace it with:
 Find this line:
 
 ```ts
-    // Lesson 01: tell the client who this agent is.
+    // Lesson 03: tell the client who this agent is.
 ```
 
 Replace it with:
@@ -275,7 +273,7 @@ import { createAI } from "agents/models/pi-ai";
 import { WebSockets } from "agents/websockets";
 import { PiSessionSockets } from "./sockets";
 import { createWorkspaceTools, JAVASCRIPT_BACKEND } from "./workspace";
-// Lesson 02: scope the tools and gate write actions here.
+// Lesson 04: scope the tools and gate write actions here.
 
 const MODEL_ID = "@cf/zai-org/glm-5.3-flash";
 
@@ -306,7 +304,7 @@ export class Agent extends DurableObject<Env> {
   readonly registry = createRegistry();
   readonly harness = new PiHarness({
     harness: async ({ storage, context, onWake }) => {
-      // Lesson 02: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
+      // Lesson 04: offer only the TOOLS, and gate the APPROVAL_REQUIRED ones.
       const tools = createWorkspaceTools(this.workspace);
       // pi's own extension: the system prompt and the tools.
       this.registry.install({
@@ -344,7 +342,7 @@ export class Agent extends DurableObject<Env> {
   });
 
   // App glue, not the harness: how this app puts sessions on a socket.
-  // Lesson 02: create the approval gate and hand it to the sockets.
+  // Lesson 04: create the approval gate and hand it to the sockets.
   readonly sockets = new PiSessionSockets(
     this.harness,
     this.registry,
@@ -397,22 +395,22 @@ Stop any running dev server with **Ctrl+C**, then start it:
 pnpm start
 ```
 
-Open [http://localhost:5173](http://localhost:5173). The header now shows `agent-template`, your user id, and `gateway default`.
+Open [http://localhost:5173](http://localhost:5173). The header now shows your agent's name, your user id, and `gateway` followed by your agent's name.
 
 Select **Write a file** and send it. The agent writes the file and reads it back, without asking anyone. You fix that in the next lesson.
 
 Open the Local Explorer at [http://localhost:5173/cdn-cgi/local/explorer/observability](http://localhost:5173/cdn-cgi/local/explorer/observability). The newest traces show your WebSocket connection to the agent, and the Durable Object work behind each turn: storage calls, alarms and the model subrequest.
 
-The `AI` binding is remote, so even local model calls go through AI Gateway on your account. In the [Cloudflare dashboard](https://dash.cloudflare.com/), go to **AI** > **AI Gateway** > **default** > **Logs** and open the newest log. Its custom metadata shows `agent_id: agent-template` and your `user_id`.
+The `AI` binding is remote, so even local model calls go through AI Gateway on your account. In the [Cloudflare dashboard](https://dash.cloudflare.com/), go to **AI** > **AI Gateway**, open your agent's gateway, then **Logs**, and open the newest log. Its custom metadata shows your agent's name as `agent_id`, and your `user_id`. The gateway's rate limit and spend limits already apply to these calls.
 
 ## Success check
 
 You are ready for the next lesson when:
 
-- The header shows `agent-template` and `gateway default`.
+- The header shows your agent's name and gateway.
 - The Local Explorer shows traces for your message.
-- The newest log in the `default` gateway has `agent_id` and `user_id` metadata.
+- The newest log in your agent's gateway has `agent_id` and `user_id` metadata.
 
 ## Next lesson
 
-In the next lesson, you will [scope the agent's tools and gate its write actions](/02-scope-and-approve), so it can't change anything without your approval.
+In the next lesson, you will [scope the agent's tools and gate its write actions](/04-scope-and-approve), so it can't change anything without your approval.

@@ -33,7 +33,7 @@ variable "github_token" {
 }
 
 variable "template_repo" {
-  description = "The template repository you pushed in lesson 04."
+  description = "The template repository you pushed in lesson 06."
   type        = string
   default     = "agent-template"
 }

@@ -1,23 +1,23 @@
 ---
 title: AI Gateway
 description: A gateway for the agent, with a request rate limit and daily spend limits per agent and per user.
-group: terraform
-lesson: 5
+group: provision
+lesson: 1
 ---
 
 ## Goal
 
-Give the agent its own AI Gateway, with hard usage limits enforced before any model is called:
+You start as the platform team. Before anyone writes agent code, give the agent its own AI Gateway, with hard usage limits enforced before any model is called:
 
 - a request rate limit across the whole agent
 - a daily spend limit for the agent
 - a daily spend limit for each user
 
-From here on, everything an agent gets is created by Terraform from one agent name.
+Everything an agent gets is created by Terraform from one agent name. The gateway comes first, so the agent's limits apply from its very first model call, on your laptop too.
 
 ## Starting point
 
-Switch to the Terraform folder:
+Start in the Terraform folder:
 
 ```bash
 cd lab/terraform
@@ -136,7 +136,7 @@ output "ai_gateway_id" {
 }
 ```
 
-The two spend limit rules are the agent and user budgets. The first has no dimensions, so every call through the agent's gateway shares one budget. The second splits by the `user_id` metadata the agent sends with every call (lesson 01), so each user gets a budget of their own. When a rule is over budget, or the rate limit is hit, the gateway answers `429` and the model is never called.
+The two spend limit rules are the agent and user budgets. The first has no dimensions, so every call through the agent's gateway shares one budget. The second splits by the `user_id` metadata the agent sends with every call, so each user gets a budget of their own. You add that metadata to the agent in lesson 03. When a rule is over budget, or the rate limit is hit, the gateway answers `429` and the model is never called.
 
 ## Run and verify
 
@@ -152,7 +152,7 @@ In the [Cloudflare dashboard](https://dash.cloudflare.com/), go to **AI** > **AI
 - **Spend limits**: two rules, one per day for the whole gateway, and one per day per `user_id`.
 
 <Callout type="note" title="Spend limits are eventually consistent">
-A call's cost is counted after it finishes, so a burst of calls can briefly pass a spend limit. The rate limit is exact, which makes it the one to watch fire in lesson 09.
+A call's cost is counted after it finishes, so a burst of calls can briefly pass a spend limit. The rate limit is exact, which makes it the one to watch fire in lesson 08.
 </Callout>
 
 ## Success check
@@ -165,4 +165,4 @@ You are ready for the next lesson when:
 
 ## Next lesson
 
-In the next lesson, you will [create the agent's Worker](/06-worker).
+In the next lesson, you will [create the agent's Worker](/02-worker).

@@ -29,8 +29,8 @@ Folder structure:
 
 ```txt
 lab/
-  template/    the agent template you edit in lessons 01–04
-  terraform/   the Terraform module you build in lessons 05–07
+  terraform/   the Terraform module you build in lessons 01, 02 and 07
+  template/    the agent template you edit in lessons 03–06
 ```
 
 ### Install the template's dependencies
@@ -47,7 +47,7 @@ npx wrangler login
 npx wrangler whoami
 ```
 
-`whoami` lists your workshop account and its **Account ID**. Note the Account ID: you need it in lesson 05.
+`whoami` lists your workshop account and its **Account ID**. Note the Account ID: you need it in lesson 01.
 
 <Callout type="tip" title="More than one account?">
 If `whoami` lists more than one account, set the workshop account for every command in this terminal:
@@ -57,7 +57,7 @@ export CLOUDFLARE_ACCOUNT_ID=<your-account-id>
 ```
 </Callout>
 
-In the [Cloudflare dashboard](https://dash.cloudflare.com/), open **Workers & Pages** once. If it asks you to choose a workers.dev subdomain, pick one: your agent is served from it in lesson 08.
+In the [Cloudflare dashboard](https://dash.cloudflare.com/), open **Workers & Pages** once. If it asks you to choose a workers.dev subdomain, pick one: your agent is served from it in lesson 07.
 
 ### Log in to GitHub
 
@@ -66,7 +66,7 @@ gh auth login --scopes workflow
 gh auth status
 ```
 
-The `workflow` scope lets you push files in `.github/workflows`, which you do in lesson 04. `gh` doesn't ask for it by default. If you are already logged in, add it with `gh auth refresh --scopes workflow`.
+The `workflow` scope lets you push files in `.github/workflows`, which you do in lesson 06. `gh` doesn't ask for it by default. If you are already logged in, add it with `gh auth refresh --scopes workflow`.
 
 ### Create a Cloudflare API token
 
@@ -86,7 +86,7 @@ Terraform uses this token to create your agent's repository and set its secrets.
 2. Select the `repo` and `workflow` scopes. Add `delete_repo` if you want `terraform destroy` to delete the repository after the workshop.
 3. Select **Generate token**, and copy the token.
 
-Keep both tokens somewhere safe, such as your password manager. You paste them into Terraform in lesson 05.
+Keep both tokens somewhere safe, such as your password manager. You paste them into Terraform in lesson 01.
 
 ## Success check
 

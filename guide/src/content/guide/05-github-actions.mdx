@@ -2,7 +2,7 @@
 title: GitHub Actions
 description: A deploy workflow that ships each agent under its own name, with its own AI Gateway.
 group: template
-lesson: 3
+lesson: 5
 ---
 
 ## Goal
@@ -11,7 +11,7 @@ Every agent stamped from the template should deploy the same way, under its own 
 
 ## Starting point
 
-Continue in the template from lesson 02:
+Continue in the template from lesson 04:
 
 ```bash
 cd lab/template
@@ -90,7 +90,7 @@ jobs:
 
 What it does:
 
-- Runs on every push to `main`, and on demand (`workflow_dispatch`).
+- Runs on every push to `main`, including the commit Terraform makes when it stamps an agent's repository, and on demand (`workflow_dispatch`).
 - Skips the template repository itself: only repositories with an `AGENT_NAME` variable deploy.
 - `--name` deploys the Worker under the agent's name, and the two `--var` flags replace `AGENT_ID` and `AI_GATEWAY_ID` from `wrangler.jsonc`. One template, many agents, and no agent edits its own config.
 - The Cloudflare API token and Account ID come from repository secrets. Terraform sets the secrets and variables in lesson 07.
@@ -126,4 +126,4 @@ You are ready for the next lesson when:
 
 ## Next lesson
 
-In the next lesson, you will [push the template to GitHub](/04-template-repo) and make it a template repository.
+In the next lesson, you will [push the template to GitHub](/06-template-repo) and make it a template repository.

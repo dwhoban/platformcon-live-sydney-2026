@@ -5,9 +5,9 @@ stamps out everything the agent gets:
 
 | File | Lesson | Creates |
 | --- | --- | --- |
-| `ai_gateway.tf` | 05 | The agent's AI Gateway, with a rate limit and spend limits per agent and per user |
-| `worker.tf` | 06 | The agent's Worker, on workers.dev and tagged `golden-path` |
-| `github.tf` | 07 | The agent's repository from the template, with its deploy secrets and variables |
+| `ai_gateway.tf` | 01 | The agent's AI Gateway, with a rate limit and spend limits per agent and per user |
+| `worker.tf` | 02 | The agent's Worker, on workers.dev and tagged `golden-path` |
+| `github.tf` | 07 | The agent's repository from the template, with its deploy secrets and variables, and the commit that starts its first deploy |
 
 The starting point declares the providers (`versions.tf`, `providers.tf`)
 and the inputs (`variables.tf`). You create the three files above while

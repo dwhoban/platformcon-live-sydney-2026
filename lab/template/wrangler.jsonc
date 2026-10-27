@@ -10,7 +10,7 @@
 	"compatibility_flags": [
 		"nodejs_compat"
 	],
-	// Lesson 01: identity goes here.
+	// Lesson 03: identity goes here.
 	"ai": {
 		"binding": "AI",
 		"remote": true
@@ -44,7 +44,7 @@
 			]
 		}
 	],
-	// Lesson 01: usage limits go here.
-	// Lesson 01: tracing goes here.
+	// Lesson 03: usage limits go here.
+	// Lesson 03: tracing goes here.
 	"upload_source_maps": true
 }
