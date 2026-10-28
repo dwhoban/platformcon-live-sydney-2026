@@ -16,7 +16,7 @@ You will leave with:
 - The 3 adoption metrics worth tracking from day one
 
 ## Folder Structure
-|- guide/ Lab documentation for users to follow using @cloudlfare/kumo design system.
+|- guide/ Lab documentation for users to follow using @cloudflare/kumo design system.
 |- lab/ starting point for the golden path
 |--- template/  starting point for agent template to be consumed by terraform
 |--- terraform/ terraform module to deploy the golden path
@@ -25,17 +25,17 @@ You will leave with:
 
 Each attendee will be provided with a labs.cloudflare.com account correctly entitled with its own zone.
 
-
-
 ## Session Flow
 1. Intros and overview
-2. Template Setup: AI Gateway, Vars and Wrangler.jsonc
-3. Template Setup: Github Actions
-4. Tempalte Setup: Create Template Repo & Push
-5. Terraform: Create AI Gateway
-6. Terraform: Create Worker
-6. Terraform: Create Repo + Secrets etc
-7. Trigger Deploy
+2. Setup: tools, accounts, tokens and the lab folder (00)
+3. Terraform: Create AI Gateway with rate and spend limits (01)
+4. Terraform: Create Worker (02, cut line if late)
+5. Template Setup: AI Gateway, Vars and Wrangler.jsonc (03)
+6. Template Setup: Scoped tools and approval gate (04)
+7. Template Setup: Create Template Repo & Push (05)
+8. Template Setup: GitHub Actions, pushed to the template (06)
+9. Terraform: Create Repo + Secrets, and the `AGENT.md` commit triggers the deploy (07)
+10. Wrap-up: watch each control fire, adoption metrics (08)
 
 ## Lessons
 

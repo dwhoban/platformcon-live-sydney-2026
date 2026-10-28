@@ -41,6 +41,8 @@ Open the guide and start at **Setup**. You need Node.js 22 or later, pnpm, the G
 | 07 | Repo & first deploy | The agent's repository, stamped from the template and deployed by one `terraform apply` |
 | 08 | Wrap-up | Watch each control fire, and the three adoption metrics |
 
+The platform team provisions the agent first (01–02), so local development already runs through the agent's own gateway and its limits. The template is then built and published (03–06). Finally, one `terraform apply` stamps the agent's repository from the template and commits `AGENT.md` to it. That push starts the deploy workflow, which ships the agent to its Worker (07).
+
 ## Run the guide locally
 
 ```sh
