@@ -36,8 +36,8 @@ Open the guide and start at **Setup**. You need Node.js 22 or later, pnpm, the G
 | 02 | Worker | The agent's Worker, on workers.dev and tagged `golden-path` |
 | 03 | AI Gateway & config | Identity, a CPU limit and tracing, with every model call through the agent's gateway |
 | 04 | Scoped tools & approvals | A tool allowlist, and an approval gate before write actions |
-| 05 | GitHub Actions | A deploy workflow that ships each agent under its own name |
-| 06 | Template repo & push | The template, published as a GitHub template repository |
+| 05 | Template repo | The template, published as a GitHub template repository |
+| 06 | GitHub Actions | A deploy workflow in the template that ships each agent under its own name |
 | 07 | Repo & first deploy | The agent's repository, stamped from the template and deployed by one `terraform apply` |
 | 08 | Wrap-up | Watch each control fire, and the three adoption metrics |
 

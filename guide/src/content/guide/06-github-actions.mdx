@@ -2,16 +2,16 @@
 title: GitHub Actions
 description: A deploy workflow that ships each agent under its own name, with its own AI Gateway.
 group: template
-lesson: 5
+lesson: 6
 ---
 
 ## Goal
 
-Every agent stamped from the template should deploy the same way, under its own name, without anyone editing its code. Add a workflow that builds the template and deploys it as the agent named in the repository's variables.
+Every agent stamped from the template should deploy the same way, under its own name, without anyone editing its code. Add a workflow to the template repository that builds the template and deploys it as the agent named in the repository's variables. Every repository stamped from the template gets a copy.
 
 ## Starting point
 
-Continue in the template from lesson 04:
+Continue in the template from lesson 05:
 
 ```bash
 cd lab/template
@@ -20,6 +20,7 @@ cd lab/template
 ## Steps
 
 1. Create the deploy workflow.
+2. Push it to the template.
 
 ### 1. Create the deploy workflow
 
@@ -95,6 +96,18 @@ What it does:
 - `--name` deploys the Worker under the agent's name, and the two `--var` flags replace `AGENT_ID` and `AI_GATEWAY_ID` from `wrangler.jsonc`. One template, many agents, and no agent edits its own config.
 - The Cloudflare API token and Account ID come from repository secrets. Terraform sets the secrets and variables in lesson 07.
 
+### 2. Push it to the template
+
+```bash
+git add .github
+git commit -m "Deploy workflow"
+git push
+```
+
+<Callout type="warning" title="Push refused?">
+If the push fails with `refusing to allow an OAuth App to create or update workflow`, your GitHub login is missing the `workflow` scope. Run `gh auth refresh --scopes workflow`, then `git push` again.
+</Callout>
+
 ## Run and verify
 
 The workflow runs on GitHub, but you can run its deploy command locally as a dry run. Build the template, then deploy it as an agent called `my-agent` without uploading anything:
@@ -117,13 +130,22 @@ env.LOADER                          Worker Loader
 --dry-run: exiting now.
 ```
 
+Then open the template repository on GitHub:
+
+```bash
+gh repo view --web
+```
+
+On the **Actions** tab, **Deploy agent** has run once, for your push, and skipped its deploy job: the template repository has no `AGENT_NAME` variable.
+
 ## Success check
 
 You are ready for the next lesson when:
 
 - `.github/workflows/deploy.yml` exists.
 - The dry run lists `env.AGENT_ID` and `env.AI_GATEWAY_ID`, and exits without deploying.
+- The template's first **Deploy agent** run skipped its deploy job.
 
 ## Next lesson
 
-In the next lesson, you will [push the template to GitHub](/06-template-repo) and make it a template repository.
+The template is done. Back to the platform team: in the next lesson, you will [stamp the agent's repository from the template and ship it](/07-repo-secrets).

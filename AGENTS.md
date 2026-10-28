@@ -39,9 +39,9 @@ Each attendee will be provided with a labs.cloudflare.com account correctly enti
 
 ## Lessons
 
-`guide/src/content/guide/`: `00-setup`, `01-ai-gateway`, `02-worker`, `03-template-config`, `04-scope-and-approve`, `05-github-actions`, `06-template-repo`, `07-repo-secrets`, `08-wrap-up`. The platform provisions first (01–02), the template is built against the agent's own gateway (03–06), then one `terraform apply` stamps the repo and its `AGENT.md` commit triggers the deploy (07). Cut line if late: `02-worker` (Wrangler creates the Worker on first deploy).
+`guide/src/content/guide/`: `00-setup`, `01-ai-gateway`, `02-worker`, `03-template-config`, `04-scope-and-approve`, `05-template-repo`, `06-github-actions`, `07-repo-secrets`, `08-wrap-up`. The platform provisions first (01–02), the template is built against the agent's own gateway (03–06), then one `terraform apply` stamps the repo and its `AGENT.md` commit triggers the deploy (07). Cut line if late: `02-worker` (Wrangler creates the Worker on first deploy).
 
-`lab/template` and `lab/terraform` are the starting point. Paste points in the template are marked `// Lesson 03` and `// Lesson 04`; lesson 04 creates `src/approvals.ts`, lesson 05 creates `.github/workflows/deploy.yml`, lessons 01, 02 and 07 create `ai_gateway.tf`, `worker.tf` and `github.tf`. Code in the lessons must reproduce the finished files exactly.
+`lab/template` and `lab/terraform` are the starting point. Paste points in the template are marked `// Lesson 03` and `// Lesson 04`; lesson 04 creates `src/approvals.ts`, lesson 06 creates `.github/workflows/deploy.yml` and pushes it to the template repo created in 05, lessons 01, 02 and 07 create `ai_gateway.tf`, `worker.tf` and `github.tf`. Code in the lessons must reproduce the finished files exactly.
 
 ## The 5 defaults on Cloudflare
 

@@ -1,8 +1,8 @@
 ---
-title: "Template repo & push"
+title: "Template repo"
 description: Push the template to GitHub and mark it as a template repository.
 group: template
-lesson: 6
+lesson: 5
 ---
 
 ## Goal
@@ -11,7 +11,7 @@ Publish the template so the platform can stamp agents from it: push it to GitHub
 
 ## Starting point
 
-Continue in the template from lesson 05:
+Continue in the template from lesson 04:
 
 ```bash
 cd lab/template
@@ -41,10 +41,6 @@ gh repo create agent-template --private --source . --push
 
 Keep the name `agent-template`: the Terraform module looks for it in lesson 07.
 
-<Callout type="warning" title="Push refused?">
-If the push fails with `refusing to allow an OAuth App to create or update workflow`, your GitHub login is missing the `workflow` scope. Run `gh auth refresh --scopes workflow`, then `git push -u origin main`.
-</Callout>
-
 ### 3. Mark it as a template
 
 ```bash
@@ -67,21 +63,12 @@ You should see:
 }
 ```
 
-Open the repository on GitHub:
-
-```bash
-gh repo view --web
-```
-
-On the **Actions** tab, **Deploy agent** has already run once, for your push, and skipped its deploy job: the template repository has no `AGENT_NAME` variable.
-
 ## Success check
 
 You are ready for the next lesson when:
 
 - `gh repo view` shows `"isTemplate": true`.
-- The first **Deploy agent** run skipped its deploy job.
 
 ## Next lesson
 
-Back to the platform team. In the next lesson, you will [stamp the agent's repository from the template and ship it](/07-repo-secrets).
+The template has code but no way to ship it. In the next lesson, you will add [a GitHub Actions workflow](/06-github-actions) to the template, so every agent stamped from it deploys itself.
