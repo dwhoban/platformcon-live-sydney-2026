@@ -5,7 +5,7 @@
  */
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "platformcon-sydney-2026-guide",
+	"name": "platformcon-sydney",
 	"compatibility_date": "2026-10-27",
 	"assets": {
 		"directory": "./dist",
